@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Story Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/web/style.css" />
+</head>
+<body>
+
+  <!-- ─── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">Story Studio</span>
+      </div>
+      <div class="nav-meta" id="navMeta">
+        <span class="nav-count" id="navCount"></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ────────────────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <canvas class="star-canvas" id="starCanvas"></canvas>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Powered by AI</p>
+      <h1 class="hero-title">Where Imagination<br>Becomes Cinema</h1>
+      <p class="hero-subtitle">Type a story idea below and watch it come to life — written, illustrated, voiced, and filmed by AI in minutes.</p>
+      <button class="hero-cta" onclick="focusPrompt()">✨ Create Your Story</button>
+    </div>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+  </section>
+
+  <!-- ─── Main content ─────────────────────────────────────── -->
+  <main class="main" id="main">
+
+    <!-- Stories section -->
+    <section class="stories-section" id="storiesSection" style="display:none;">
+      <div class="section-header">
+        <h2 class="section-title">Your Stories</h2>
+        <span class="section-count" id="sectionCount"></span>
+      </div>
+      <div class="stories-grid" id="storiesGrid"></div>
+    </section>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">✦</div>
+      <h3 class="empty-title">No stories yet</h3>
+      <p class="empty-sub">Type your first idea in the bar below and press <strong>Generate</strong></p>
+      <div class="empty-examples">
+        <span class="example-tag" onclick="useExample(this)">A little dragon who is afraid of fire</span>
+        <span class="example-tag" onclick="useExample(this)">A brave rabbit saves the enchanted forest</span>
+        <span class="example-tag" onclick="useExample(this)">A lonely star who falls to earth</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ─── Generation bar (bottom dock) ────────────────────── -->
+  <div class="gen-bar" id="genBar">
+    <div class="gen-bar-inner">
+      <div class="gen-input-wrap">
+        <span class="gen-input-icon">✦</span>
+        <input
+          type="text"
+          class="gen-input"
+          id="promptInput"
+          placeholder="Enter your story idea... (e.g. a little dragon who can't fly)"
+          maxlength="200"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <button class="gen-btn" id="generateBtn" onclick="startGeneration()">
+        <span class="gen-btn-text">Generate</span>
+        <span class="gen-btn-spinner" style="display:none;">
+          <span class="spinner-ring"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Progress Modal ───────────────────────────────────── -->
+  <div class="modal-backdrop" id="progressBackdrop" style="display:none;">
+    <div class="modal progress-modal" id="progressModal">
+      <div class="progress-header">
+        <div class="progress-logo">✦</div>
+        <h2 class="progress-title" id="progressTitle">Crafting your story…</h2>
+        <p class="progress-prompt" id="progressPrompt"></p>
+      </div>
+
+      <div class="progress-steps" id="progressSteps">
+        <div class="step" id="step-story_writer">
+          <div class="step-icon">📖</div>
+          <div class="step-body">
+            <div class="step-label">Writing story</div>
+            <div class="step-detail" id="detail-story_writer">Crafting characters and plot…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+        <div class="step" id="step-scene_director">
+          <div class="step-icon">🎬</div>
+          <div class="step-body">
+            <div class="step-label">Directing scenes</div>
+            <div class="step-detail" id="detail-scene_director">Planning visuals…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+        <div class="step" id="step-media">
+          <div class="step-icon">🎨</div>
+          <div class="step-body">
+            <div class="step-label">Generating images &amp; voice</div>
+            <div class="step-detail" id="detail-media">Painting each scene…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+        <div class="step" id="step-subtitles">
+          <div class="step-icon">📝</div>
+          <div class="step-body">
+            <div class="step-label">Creating subtitles</div>
+            <div class="step-detail" id="detail-subtitles">Transcribing narration…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+        <div class="step" id="step-compositor">
+          <div class="step-icon">🎞️</div>
+          <div class="step-body">
+            <div class="step-label">Composing video</div>
+            <div class="step-detail" id="detail-compositor">Assembling the final film…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+        <div class="step" id="step-reviewer">
+          <div class="step-icon">✅</div>
+          <div class="step-body">
+            <div class="step-label">Quality review</div>
+            <div class="step-detail" id="detail-reviewer">Final checks…</div>
+          </div>
+          <div class="step-status step-pending">
+            <span class="step-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Video Modal ──────────────────────────────────────── -->
+  <div class="modal-backdrop" id="videoBackdrop" style="display:none;" onclick="closeVideo(event)">
+    <div class="modal video-modal" id="videoModal">
+      <button class="close-btn" onclick="closeVideo()">✕</button>
+      <div class="video-wrap">
+        <video
+          id="videoPlayer"
+          controls
+          playsinline
+          preload="auto"
+          class="video-player"
+        ></video>
+        <div class="video-error" id="videoError" style="display:none;">
+          <span id="videoErrorMsg">Could not load video.</span>
+        </div>
+      </div>
+      <div class="video-info">
+        <h2 class="video-title" id="videoTitle"></h2>
+        <p class="video-summary" id="videoSummary"></p>
+        <div class="video-meta">
+          <span class="video-meta-item" id="videoDuration"></span>
+          <span class="video-meta-item" id="videoDate"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Improve Modal ──────────────────────────────────── -->
+  <div class="modal-backdrop" id="improveBackdrop" style="display:none;">
+    <div class="modal progress-modal" id="improveModal">
+      <button class="close-btn" onclick="closeImproveModal()">✕</button>
+      <div class="progress-header">
+        <div class="progress-logo">⚙</div>
+        <h2 class="progress-title" id="improveTitle">Improve Website</h2>
+        <p class="progress-prompt">Web agents will analyse and upgrade the site</p>
+      </div>
+
+      <!-- Target selector -->
+      <div class="improve-controls" id="improveControls">
+        <select class="improve-select" id="improveTarget">
+          <option value="all">All agents</option>
+          <option value="qa">QA — test endpoints</option>
+          <option value="design">Designer — improve CSS</option>
+          <option value="frontend">Frontend — improve JS</option>
+          <option value="backend">Backend — improve API</option>
+          <option value="review">Reviewer — quality report</option>
+        </select>
+        <input type="text" class="gen-input improve-instruction" id="improveInstruction"
+               placeholder="Optional instruction (e.g. add story search)…" />
+        <button class="gen-btn" id="improveRunBtn" onclick="runImprove()">Run Agents</button>
+      </div>
+
+      <!-- Steps (shown while running) -->
+      <div class="progress-steps" id="improveSteps" style="display:none;">
+        <div class="step" id="istep-qa">
+          <div class="step-icon">🧪</div>
+          <div class="step-body"><div class="step-label">QA checks</div><div class="step-detail" id="idetail-qa">Testing endpoints…</div></div>
+          <div class="step-status step-pending"><span class="step-dot"></span></div>
+        </div>
+        <div class="step" id="istep-design">
+          <div class="step-icon">🎨</div>
+          <div class="step-body"><div class="step-label">Designer</div><div class="step-detail" id="idetail-design">Improving style.css…</div></div>
+          <div class="step-status step-pending"><span class="step-dot"></span></div>
+        </div>
+        <div class="step" id="istep-frontend">
+          <div class="step-icon">⚡</div>
+          <div class="step-body"><div class="step-label">Frontend</div><div class="step-detail" id="idetail-frontend">Improving app.js…</div></div>
+          <div class="step-status step-pending"><span class="step-dot"></span></div>
+        </div>
+        <div class="step" id="istep-backend">
+          <div class="step-icon">🔧</div>
+          <div class="step-body"><div class="step-label">Backend</div><div class="step-detail" id="idetail-backend">Improving server.py…</div></div>
+          <div class="step-status step-pending"><span class="step-dot"></span></div>
+        </div>
+        <div class="step" id="istep-review">
+          <div class="step-icon">📋</div>
+          <div class="step-body"><div class="step-label">Reviewer</div><div class="step-detail" id="idetail-review">Quality review…</div></div>
+          <div class="step-status step-pending"><span class="step-dot"></span></div>
+        </div>
+      </div>
+
+      <!-- Review output -->
+      <div id="improveReviewOut" style="display:none;">
+        <pre class="review-pre" id="improveReviewText"></pre>
+      </div>
+
+      <div class="progress-bar-wrap" id="improveBarWrap" style="display:none;">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="improveBarFill"></div>
+        </div>
+        <span class="progress-pct" id="improvePct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/app.js"></script>
+</body>
+</html>

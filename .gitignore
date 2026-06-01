@@ -1,0 +1,28 @@
+# Secrets & env
+.env
+.streamlit/secrets.toml
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Generated outputs (runtime artifacts)
+cache.json
+workspace/*
+!workspace/.gitkeep
+stories/
+*.log
+
+# Live test files
+test_google_live.py
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
